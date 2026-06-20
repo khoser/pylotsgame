@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="BackgroundAgentGlobalSettings">
+    <option name="selectedModelId" value="auto" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="49c68d2f-213b-432d-a9d2-ff534fbffdbd" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CopilotChats">
+    <option name="panelChat">
+      <chat>
+        <option name="activeSessionId" value="77a15f63-2852-4dc3-b323-20e5847601fb" />
+        <option name="sessions">
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="77a15f63-2852-4dc3-b323-20e5847601fb" />
+            <option name="modeId" value="Ask" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+        </option>
+        <option name="type" value="PANEL" />
+      </chat>
+    </option>
+  </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_/Users/ktu/kter_ru/gama" value="3FMqiGqDaAOdRUkh71GJRVVajX5" />
+    </persistenceIdMap>
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="9" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+        <option value="HTML File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.0000000000027571" />
+      <entry key="MS500" value="1.004876291206647" />
+      <entry key="S2" value="1.264254510140345" />
+      <entry key="S5" value="1.5872309856068267" />
+      <entry key="S10" value="1.7663099801038915" />
+      <entry key="S30" value="1.9150991681279284" />
+      <entry key="S60" value="1.9566081580918744" />
+      <entry key="M2" value="1.9780634734473392" />
+      <entry key="M5" value="1.9911669586569074" />
+      <entry key="M10" value="1.9955736831881947" />
+      <entry key="M15" value="1.9970469409118146" />
+      <entry key="M30" value="1.9985287474723084" />
+      <entry key="H1" value="2.0758602531711174" />
+      <entry key="H2" value="10.588136883055167" />
+      <entry key="H4" value="93.58498396985243" />
+      <entry key="D1" value="663.0275014026142" />
+      <entry key="W1" value="930.0064049013432" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="0.0" />
+      <entry key="S30" value="0.0" />
+      <entry key="S60" value="7.355783598880522E-240" />
+      <entry key="M2" value="5.3963194400340595E-120" />
+      <entry key="M5" value="4.5245298526312976E-48" />
+      <entry key="M10" value="4.528177289459016E-24" />
+      <entry key="M15" value="4.952133311168715E-16" />
+      <entry key="M30" value="7.082709413228472E-8" />
+      <entry key="H1" value="0.0011202924944502142" />
+      <entry key="H2" value="0.15762327875143314" />
+      <entry key="H4" value="1.9264267985199666" />
+      <entry key="D1" value="15.74259196559601" />
+      <entry key="W1" value="22.596216513422696" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="0.9012504626131167" />
+      <entry key="MS500" value="0.9841174430904354" />
+      <entry key="S2" value="1.2566081709132964" />
+      <entry key="S5" value="1.5829598105234353" />
+      <entry key="S10" value="1.7638379936941333" />
+      <entry key="S30" value="1.9141819640459998" />
+      <entry key="S60" value="1.9561365512287627" />
+      <entry key="M2" value="1.977824308760987" />
+      <entry key="M5" value="1.9910704716145888" />
+      <entry key="M10" value="1.9955253015840022" />
+      <entry key="M15" value="1.9970146557328194" />
+      <entry key="M30" value="1.9985126601620375" />
+      <entry key="H1" value="2.076971197603471" />
+      <entry key="H2" value="10.745662218509857" />
+      <entry key="H4" value="95.5108248165266" />
+      <entry key="D1" value="678.7692900431954" />
+      <entry key="W1" value="952.6024565147612" />
+    </decayedShown>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3FMqiGqDaAOdRUkh71GJRVVajX5" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.engine.executor": "Run",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "copilot.chat.legacySessionMetadata.migrated": "true",
+    "git-widget-placeholder": "docker",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-c59985aa861c-c2ffad84badb-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-261.24374.152" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="49c68d2f-213b-432d-a9d2-ff534fbffdbd" name="Changes" comment="" />
+      <created>1781895412168</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1781895412168</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
+  </component>
+</project>

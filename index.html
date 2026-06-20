@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        margin: 0;
+    }
+    #controls {
+        margin-bottom: 20px;
+    }
+    #controls label {
+        margin-right: 20px;
+    }
+    #gameContainer {
+        width: 100%;
+    }
+    #gameCanvas {
+        border: 1px solid #999;
+        display: block;
+        max-width: 100%;
+    }
+    </style>
+</head>
+<body>
+
+<div id="controls">
+    <label>
+        Размер поля:
+        <input
+            type="number"
+            id="size"
+            value="10"
+            min="2"
+            max="1000"
+        >
+    </label>
+
+    <label>
+        Цвет 1:
+        <input
+            type="color"
+            id="color0"
+            value="#ffffff"
+        >
+    </label>
+
+    <label>
+        Цвет 2:
+        <input
+            type="color"
+            id="color1"
+            value="#000000"
+        >
+    </label>
+
+    <button id="createBtn">
+        Создать
+    </button>
+</div>
+
+<div id="gameContainer">
+    <canvas id="gameCanvas"></canvas>
+    <div id="winMessage" style="margin-top: 20px; font-size: 24px; font-weight: bold; color: #00aa00; display: none;"></div>
+</div>
+
+<script>
+// Генерация "game_id" средствами JS (устойчиво только до перезагрузки)
+function generateGameId() {
+    // 32-символьная hex-строка
+    return Array.from(crypto.getRandomValues(new Uint8Array(16)))
+        .map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+const GAME_ID = generateGameId();
+
+const API_URL = "/game-api";
+
+let currentMatrix = null;
+let gameStarted = false;
+let currentCellSize = 1;
+
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+document.getElementById("createBtn").addEventListener("click", createGame);
+document.getElementById("color0").addEventListener("change", onColorChanged);
+document.getElementById("color1").addEventListener("change", onColorChanged);
+window.addEventListener("resize", function() {
+    if (currentMatrix) {
+        drawMatrix(currentMatrix);
+    }
+});
+canvas.addEventListener("click", onCanvasClick);
+
+function createPreviewMatrix() {
+    const matrix = [];
+    for (let y = 0; y < 10; y++) {
+        const row = [];
+        for (let x = 0; x < 10; x++) {
+            row.push({
+                color: Math.random() > 0.5 ? 1 : 0
+            });
+        }
+        matrix.push(row);
+    }
+    return matrix;
+}
+
+function validateColors() {
+    const c0 = document.getElementById("color0").value;
+    const c1 = document.getElementById("color1").value;
+    if (c0 === c1) {
+        alert("Цвета должны различаться");
+        return false;
+    }
+    return true;
+}
+
+function onColorChanged() {
+    if (!validateColors()) {
+        return;
+    }
+    if (currentMatrix) {
+        drawMatrix(currentMatrix);
+    }
+}
+
+async function createGame() {
+    if (!validateColors()) {
+        return;
+    }
+    const size = parseInt(document.getElementById("size").value);
+
+    const response = await fetch(
+        API_URL + "/game/init",
+        {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                game_id: GAME_ID,
+                size: size
+            })
+        }
+    );
+    const data = await response.json();
+    if (!data.success) {
+        alert("Ошибка создания игры");
+        return;
+    }
+    gameStarted = true;
+    currentMatrix = data.matrix;
+    document.getElementById("winMessage").style.display = "none";
+    document.getElementById("winMessage").textContent = "";
+    drawMatrix(currentMatrix);
+}
+
+async function clickCell(x, y) {
+    const response = await fetch(
+        API_URL + "/game/click",
+        {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                game_id: GAME_ID,
+                x: x,
+                y: y
+            })
+        }
+    );
+    const data = await response.json();
+    console.log("Click response:", data);
+    if (!data.success) {
+        alert("Ошибка игры");
+        return;
+    }
+    currentMatrix = data.matrix;
+    drawMatrix(currentMatrix);
+    
+    if (data.win === true) {
+        document.getElementById("winMessage").textContent = `Победа за ${data.step} ходов`;
+        document.getElementById("winMessage").style.display = "block";
+    }
+}
+
+function drawMatrix(matrix) {
+    const rows = matrix.length;
+    const cols = matrix[0].length;
+
+    const color0 = document.getElementById("color0").value;
+    const color1 = document.getElementById("color1").value;
+
+    const maxCanvasSize = Math.min(window.innerWidth - 60, window.innerHeight - 180);
+
+    currentCellSize = Math.max(1, Math.floor(maxCanvasSize / Math.max(rows, cols)));
+
+    const canvasWidth = cols * currentCellSize;
+    const canvasHeight = rows * currentCellSize;
+
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+            const cell = matrix[y][x];
+            const value = (cell && typeof cell === 'object') ? cell.color : cell;
+            ctx.fillStyle = value ? color1 : color0;
+            ctx.fillRect(
+                x * currentCellSize,
+                y * currentCellSize,
+                currentCellSize,
+                currentCellSize
+            );
+        }
+    }
+}
+
+function onCanvasClick(event) {
+    if (!currentMatrix) {
+        return;
+    }
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+    const x = Math.floor(mouseX / currentCellSize);
+    const y = Math.floor(mouseY / currentCellSize);
+
+    if (
+        y < 0 ||
+        y >= currentMatrix.length ||
+        x < 0 ||
+        x >= currentMatrix[0].length
+    ) {
+        return;
+    }
+
+    if (!gameStarted) {
+        const cell = currentMatrix[y][x];
+        if (cell && typeof cell === 'object') {
+            cell.color = cell.color ? 0 : 1;
+        } else {
+            currentMatrix[y][x] = cell ? 0 : 1;
+        }
+        drawMatrix(currentMatrix);
+        return;
+    }
+    clickCell(x, y);
+}
+
+// init local preview
+currentMatrix = createPreviewMatrix();
+drawMatrix(currentMatrix);
+
+</script>
+</body>
+</html>

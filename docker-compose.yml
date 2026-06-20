@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  redis:
+    image: redis:7-alpine
+    restart: always
+    command:
+      - redis-server
+      - --appendonly
+      - yes
+    volumes:
+      - redis_data:/data
+
+  game-api:
+    build: .
+    restart: always
+    environment:
+      REDIS_HOST: redis
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+
+volumes:
+  redis_data:
