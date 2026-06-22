@@ -67,6 +67,28 @@ class HiScoreRequest(BaseModel):
     name: str
 
 
+def ensure_table_exists():
+    """Create game_results table if it doesn't exist."""
+    if not mysql_enabled:
+        return
+
+    try:
+        with mysql_conn.cursor() as cursor:
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS game_results (
+                    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR(255) NOT NULL,
+                    steps INT NOT NULL,
+                    size INT NOT NULL,
+                    finished_at DATETIME NOT NULL
+                )
+                """
+            )
+    except Exception as e:
+        print(f"MySQL table creation error: {e}")
+
+
 def save_result(name: str, state):
     if not mysql_enabled:
         return
@@ -76,6 +98,9 @@ def save_result(name: str, state):
 
     if state is None:
         return
+
+    # Ensure table exists before saving
+    ensure_table_exists()
 
     try:
         with mysql_conn.cursor() as cursor:
@@ -115,7 +140,7 @@ def load_state(game_id):
     return engine.Field.from_dict(json.loads(raw))
 
 
-def get_top_hiscores(limit: int = 3):
+def get_top_hiscores(size: int = 10, limit: int = 3):
     """Get top N scores (fewest steps) from database."""
     if not mysql_enabled:
         return []
@@ -126,10 +151,11 @@ def get_top_hiscores(limit: int = 3):
                 """
                 SELECT name, steps, size
                 FROM game_results
+                WHERE size = %s
                 ORDER BY steps ASC
                 LIMIT %s
                 """,
-                (limit,)
+                (size, limit,)
             )
             results = cursor.fetchall()
             return [
