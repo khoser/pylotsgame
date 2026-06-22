@@ -63,7 +63,7 @@
 </div>
 
 <div id="topHiScores" style="margin-bottom: 20px; padding: 10px; background: #f0f0f0; border-radius: 4px; display: none;">
-    <h3 style="margin-top: 0; margin-bottom: 10px;">🏆 Лучшие результаты:</h3>
+    <h3 style="margin-top: 0; margin-bottom: 10px;">Лучшие результаты:</h3>
     <div id="hiScoresList" style="list-style: none; padding: 0; margin: 0;"></div>
 </div>
 
@@ -161,10 +161,14 @@ async function createGame() {
     document.getElementById("winMessage").style.display = "none";
     document.getElementById("winMessage").textContent = "";
     
+    console.log("Game init response:", data);
+    
     // Show top hiscores if available
     if (data.top_hiscores && data.top_hiscores.length > 0) {
+        console.log("Showing hiscores:", data.top_hiscores);
         updateHiScoresDisplay(data.top_hiscores);
     } else {
+        console.log("No hiscores to show");
         document.getElementById("topHiScores").style.display = "none";
     }
     

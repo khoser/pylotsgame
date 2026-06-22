@@ -140,8 +140,8 @@ def load_state(game_id):
     return engine.Field.from_dict(json.loads(raw))
 
 
-def get_top_hiscores(size: int = 10, limit: int = 3):
-    """Get top N scores (fewest steps) from database."""
+def get_top_hiscores(size: int, limit: int = 3):
+    """Get top N scores (fewest steps) for a specific board size."""
     if not mysql_enabled:
         return []
 
@@ -155,7 +155,7 @@ def get_top_hiscores(size: int = 10, limit: int = 3):
                 ORDER BY steps ASC
                 LIMIT %s
                 """,
-                (size, limit,)
+                (size, limit)
             )
             results = cursor.fetchall()
             return [
@@ -185,7 +185,7 @@ def init_game(request: InitRequest):
         "matrix": [[s.state for s in row] for row in state.squares],
         "win": state.even(),
         "step": state.steps,
-        "top_hiscores": get_top_hiscores(3)
+        "top_hiscores": get_top_hiscores(request.size, 3)
     }
 
 
@@ -238,5 +238,5 @@ def add_hiscore(request: HiScoreRequest):
     return {
         "success": True,
         "step": state.steps,
-        "top_hiscores": get_top_hiscores(3)
+        "top_hiscores": get_top_hiscores(len(state.squares), 3)
     }
