@@ -62,6 +62,11 @@
     </button>
 </div>
 
+<div id="topHiScores" style="margin-bottom: 20px; padding: 10px; background: #f0f0f0; border-radius: 4px; display: none;">
+    <h3 style="margin-top: 0; margin-bottom: 10px;">🏆 Лучшие результаты:</h3>
+    <div id="hiScoresList" style="list-style: none; padding: 0; margin: 0;"></div>
+</div>
+
 <div id="gameContainer">
     <canvas id="gameCanvas"></canvas>
     <div id="winMessage" style="margin-top: 20px; font-size: 24px; font-weight: bold; color: #00aa00; display: none;"></div>
@@ -155,6 +160,14 @@ async function createGame() {
     currentMatrix = data.matrix;
     document.getElementById("winMessage").style.display = "none";
     document.getElementById("winMessage").textContent = "";
+    
+    // Show top hiscores if available
+    if (data.top_hiscores && data.top_hiscores.length > 0) {
+        updateHiScoresDisplay(data.top_hiscores);
+    } else {
+        document.getElementById("topHiScores").style.display = "none";
+    }
+    
     drawMatrix(currentMatrix);
 }
 
@@ -199,6 +212,10 @@ async function clickCell(x, y) {
                 const res = await resp.json();
                 if (res && res.success) {
                     alert(`Рекорд отправлен (ходы: ${res.step})`);
+                    // Обновить список рекордов на странице
+                    if (res.top_hiscores && res.top_hiscores.length > 0) {
+                        updateHiScoresDisplay(res.top_hiscores);
+                    }
                 } else {
                     alert("Ошибка отправки хайскора");
                 }
@@ -274,6 +291,19 @@ function onCanvasClick(event) {
         return;
     }
     clickCell(x, y);
+}
+
+// update hi-scores display
+function updateHiScoresDisplay(hiscores) {
+    const hiScoresList = document.getElementById("hiScoresList");
+    hiScoresList.innerHTML = "";
+    hiscores.forEach((score, idx) => {
+        const item = document.createElement("div");
+        item.style.padding = "5px 0";
+        item.textContent = `${idx + 1}. ${score.name} — ${score.steps} ходов (поле ${score.size}x${score.size})`;
+        hiScoresList.appendChild(item);
+    });
+    document.getElementById("topHiScores").style.display = "block";
 }
 
 // modal for entering hi-score name
