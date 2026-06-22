@@ -12,7 +12,8 @@ services:
       - redis_data:/data
 
   game-api:
-    build: .
+#    build: .
+    image: ghcr.io/khoser/pylotsgame:latest
     restart: always
     environment:
       REDIS_HOST: redis

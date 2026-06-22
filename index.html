@@ -183,6 +183,30 @@ async function clickCell(x, y) {
     if (data.win === true) {
         document.getElementById("winMessage").textContent = `Победа за ${data.step} ходов`;
         document.getElementById("winMessage").style.display = "block";
+
+        // Показать модальное окно для ввода имени в таблицу рекордов
+        showHiScoreModal(async function(name) {
+            if (!name) {
+                // отмена или пустое имя — ничего не отправляем
+                return;
+            }
+            try {
+                const resp = await fetch(API_URL + "/game/add_hiscore", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ game_id: GAME_ID, name: name })
+                });
+                const res = await resp.json();
+                if (res && res.success) {
+                    alert(`Рекорд отправлен (ходы: ${res.step})`);
+                } else {
+                    alert("Ошибка отправки хайскора");
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Ошибка сети при отправке хайскора");
+            }
+        });
     }
 }
 
@@ -250,6 +274,78 @@ function onCanvasClick(event) {
         return;
     }
     clickCell(x, y);
+}
+
+// modal for entering hi-score name
+function showHiScoreModal(onAccept) {
+    // create overlay
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.left = 0;
+    overlay.style.top = 0;
+    overlay.style.right = 0;
+    overlay.style.bottom = 0;
+    overlay.style.background = 'rgba(0,0,0,0.5)';
+    overlay.style.display = 'flex';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+    overlay.style.zIndex = 9999;
+
+    const box = document.createElement('div');
+    box.style.background = '#fff';
+    box.style.padding = '20px';
+    box.style.borderRadius = '8px';
+    box.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+    box.style.minWidth = '300px';
+
+    const title = document.createElement('div');
+    title.textContent = 'Отправить рекорд?';
+    title.style.marginBottom = '10px';
+    title.style.fontWeight = 'bold';
+    box.appendChild(title);
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = 'Введите имя для таблицы рекордов';
+    input.style.width = '100%';
+    input.style.boxSizing = 'border-box';
+    input.style.marginBottom = '10px';
+    box.appendChild(input);
+
+    const buttons = document.createElement('div');
+    buttons.style.display = 'flex';
+    buttons.style.justifyContent = 'flex-end';
+    buttons.style.gap = '10px';
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = 'Отменить';
+    cancelBtn.addEventListener('click', () => {
+        document.body.removeChild(overlay);
+        // callback with null to indicate cancel
+        if (typeof onAccept === 'function') onAccept(null);
+    });
+
+    const okBtn = document.createElement('button');
+    okBtn.textContent = 'Отправить';
+    okBtn.style.fontWeight = 'bold';
+    okBtn.addEventListener('click', () => {
+        const name = input.value.trim();
+        document.body.removeChild(overlay);
+        if (typeof onAccept === 'function') onAccept(name);
+    });
+
+    buttons.appendChild(cancelBtn);
+    buttons.appendChild(okBtn);
+    box.appendChild(buttons);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    // focus input
+    input.focus();
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') okBtn.click();
+        if (e.key === 'Escape') cancelBtn.click();
+    });
 }
 
 // init local preview

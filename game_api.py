@@ -21,12 +21,32 @@ REDIS_HOST = os.getenv(
     "REDIS_HOST",
     "redis"
 )
+MYSQL_HOST = os.getenv("MYSQL_HOST")
+MYSQL_PORT = int(os.getenv("MYSQL_PORT", "3306"))
+MYSQL_DB = os.getenv("MYSQL_DB")
+MYSQL_USER = os.getenv("MYSQL_USER")
+MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
 
 redis_client = redis.Redis(
     host=REDIS_HOST,
     port=6379,
     decode_responses=True
 )
+
+import pymysql
+
+mysql_enabled = all([
+    MYSQL_HOST,
+    MYSQL_DB,
+    MYSQL_USER,
+    MYSQL_PASSWORD
+])
+
+mysql_conn = None
+
+if mysql_enabled:
+    mysql_conn = pymysql.connect(host=MYSQL_HOST, port=MYSQL_PORT, user=MYSQL_USER, password=MYSQL_PASSWORD,
+                                 database=MYSQL_DB, autocommit=True)
 
 app = FastAPI()
 
@@ -40,6 +60,43 @@ class ClickRequest(BaseModel):
     game_id: str
     x: int
     y: int
+
+
+class HiScoreRequest(BaseModel):
+    game_id: str
+    name: str
+
+
+def save_result(name: str, state):
+    if not mysql_enabled:
+        return
+
+    if name is None:
+        return
+
+    if state is None:
+        return
+
+    try:
+        with mysql_conn.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO game_results (
+                    name,
+                    steps,
+                    size,
+                    finished_at
+                )
+                VALUES (%s, %s, %s, NOW())
+                """,
+                (
+                    name,
+                    state.steps,
+                    len(state.squares)
+                )
+            )
+    except Exception as e:
+        print(f"MySQL save error: {e}")
 
 
 def save_state(game_id, state):
@@ -66,7 +123,7 @@ def init_game(request: InitRequest):
         request.game_id,
         state
     )
-    print(state)
+    # print(state)
     return {
         "success": True,
         "matrix": [[s.state for s in row] for row in state.squares],
@@ -101,5 +158,27 @@ def click(request: ClickRequest):
         "success": True,
         "matrix": [[s.state for s in row] for row in state.squares],
         "win": state.even(),
+        "step": state.steps
+    }
+
+
+@app.post("/game/add_hiscore")
+def add_hiscore(request: HiScoreRequest):
+    state = load_state(
+        request.game_id
+    )
+
+    if state is None:
+        return {
+            "success": False,
+            "error": "game_not_found"
+        }
+
+    save_result(request.name, state)
+
+    redis_client.delete(f"game:{request.game_id}")
+
+    return {
+        "success": True,
         "step": state.steps
     }
