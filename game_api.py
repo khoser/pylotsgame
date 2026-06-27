@@ -79,6 +79,7 @@ def ensure_table_exists():
                 """
                 CREATE TABLE IF NOT EXISTS game_results (
                     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                    game_id VARCHAR(255) NOT NULL UNIQUE,
                     name VARCHAR(255) NOT NULL,
                     steps INT NOT NULL,
                     size INT NOT NULL,
@@ -102,7 +103,7 @@ def ensure_table_exists():
         print(f"MySQL table creation error: {e}")
 
 
-def save_result(name: str, state):
+def save_result(game_id: str, name: str, state):
     if not mysql_enabled:
         return
 
@@ -120,14 +121,16 @@ def save_result(name: str, state):
             cursor.execute(
                 """
                 INSERT INTO game_results (
+                    game_id,
                     name,
                     steps,
                     size,
                     finished_at
                 )
-                VALUES (%s, %s, %s, NOW())
+                VALUES (%s, %s, %s, %s, NOW())
                 """,
                 (
+                    game_id,
                     name,
                     state.steps,
                     len(state.squares)
@@ -298,7 +301,7 @@ def add_hiscore(request: HiScoreRequest):
             "error": "game_not_found"
         }
 
-    save_result(request.name, state)
+    save_result(request.game_id, request.name, state)
     
     save_moves_to_mysql(request.game_id, request.name)
 
