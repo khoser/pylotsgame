@@ -87,6 +87,7 @@ const API_URL = "/game-api";
 let currentMatrix = null;
 let gameStarted = false;
 let currentCellSize = 1;
+let currentColors = null;
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -158,6 +159,10 @@ async function createGame() {
     }
     gameStarted = true;
     currentMatrix = data.matrix;
+    currentColors = {
+        color0: document.getElementById("color0").value,
+        color1: document.getElementById("color1").value
+    };
     document.getElementById("winMessage").style.display = "none";
     document.getElementById("winMessage").textContent = "";
     
@@ -184,7 +189,8 @@ async function clickCell(x, y) {
             body: JSON.stringify({
                 game_id: GAME_ID,
                 x: x,
-                y: y
+                y: y,
+                colors: currentColors
             })
         }
     );
@@ -231,12 +237,34 @@ async function clickCell(x, y) {
     }
 }
 
+function averageColor(colorA, colorB) {
+    const ca = colorA.startsWith('#') ? colorA.slice(1) : colorA;
+    const cb = colorB.startsWith('#') ? colorB.slice(1) : colorB;
+    const toRGB = (hex) => [
+        parseInt(hex.slice(0, 2), 16),
+        parseInt(hex.slice(2, 4), 16),
+        parseInt(hex.slice(4, 6), 16)
+    ];
+
+    const [r1, g1, b1] = toRGB(ca);
+    const [r2, g2, b2] = toRGB(cb);
+
+    const r = Math.round((r1 + r2) / 2);
+    const g = Math.round((g1 + g2) / 2);
+    const b = Math.round((b1 + b2) / 2);
+
+    const toHex = x => x.toString(16).padStart(2, '0');
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
 function drawMatrix(matrix) {
     const rows = matrix.length;
     const cols = matrix[0].length;
 
     const color0 = document.getElementById("color0").value;
     const color1 = document.getElementById("color1").value;
+
+    const gridColor = averageColor(color0, color1);
 
     const maxCanvasSize = Math.min(window.innerWidth - 60, window.innerHeight - 180);
 
@@ -263,6 +291,22 @@ function drawMatrix(matrix) {
             );
         }
     }
+
+    // Отрисовка сетки
+    ctx.strokeStyle = gridColor;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    // Вертикальные линии
+    for (let x = 1; x < cols; x++) {
+        ctx.moveTo(x * currentCellSize, 0);
+        ctx.lineTo(x * currentCellSize, canvasHeight);
+    }
+    // Горизонтальные линии
+    for (let y = 1; y < rows; y++) {
+        ctx.moveTo(0, y * currentCellSize);
+        ctx.lineTo(canvasWidth, y * currentCellSize);
+    }
+    ctx.stroke();
 }
 
 function onCanvasClick(event) {

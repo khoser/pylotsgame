@@ -42,6 +42,22 @@ class Field:
                     return False
         return True
 
+    def solvable(self):
+        if self.size % 2 == 0:
+            return True
+        l = {}
+        c = {}
+        for i in range(self.size):
+            l[i] = 0
+            c[i] = 0
+            for j in range(self.size):
+                l[i] += self.squares[i][j].state
+                c[i] += self.squares[j][i].state
+        for i in range(self.size):
+            if (l[0] % 2 != l[i] % 2) or (l[0] % 2 != c[i] % 2):
+                return False
+        return True
+
     def __str__(self):
         return '\n'.join([
                 ' '.join(['+' if sq.state == STATES[0] else '0' for sq in row])
