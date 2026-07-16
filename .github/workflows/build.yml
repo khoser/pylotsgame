@@ -42,9 +42,35 @@ jobs:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
+    - name: extract extra tag from commit message
+      id: extract_tag
+      run: |
+        # Get the latest commit message
+        msg=$(git log -1 --pretty=%B)
+        echo "Commit message: $msg"
+        # Try formats: "tag: v1.2.3", "extra-tag: v1.2.3", "version: v1.2.3"
+        tag=$(echo "$msg" | grep -iEo '(extra[-_]?tag|tag|version)[[:space:]]*[:=][[:space:]]*[A-Za-z0-9._-]+' | head -n1 | sed -E 's/.*[:=][[:space:]]*//I' || true)
+        # Fallback to bracketed form like [tag:v1.2]
+        if [ -z "$tag" ]; then
+          tag=$(echo "$msg" | grep -oE '\[ *tag:[[:space:]]*[A-Za-z0-9._-]+ *\]' | sed -E 's/.*tag:[[:space:]]*//; s/[]\[\]//g' | tr -d ' ' || true)
+        fi
+        # Output (empty if not found)
+        echo "tag=$tag" >> $GITHUB_OUTPUT
+
+    - name: compose tags
+      id: set_tags
+      run: |
+        registry=${{ env.REGISTRY }}
+        repo=${{ github.repository }}
+        tags="${registry}/${repo}:latest"
+        if [ -n "${{ steps.extract_tag.outputs.tag }}" ]; then
+          tags="${tags},${registry}/${repo}:${{ steps.extract_tag.outputs.tag }}"
+        fi
+        echo "tags=$tags" >> $GITHUB_OUTPUT
+
     - name: build and push docker image
       uses: docker/build-push-action@v2
       with:
         context: .
         push: true
-        tags: ${{ env.REGISTRY }}/${{ github.repository }}:latest
+        tags: ${{ steps.set_tags.outputs.tags }}
